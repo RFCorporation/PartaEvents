@@ -7,7 +7,6 @@ import requests, sys
 import sqlite3
 import codecs
 from django.dispatch import receiver
-import ctypes
 
 
 global token
@@ -18,12 +17,13 @@ token ='CAAO7ZBEZBU2qcBAAiM7WuiUCsfOdOjlwgyDrfDncpib6DI1ZCoayFIWCBpmZB52ABcVwyxC
 #reload(sys)  # Reload does the trick!
 #sys.setdefaultencoding('UTF8')
 
-class Page(models.Model):
+class EventObject(models.Model):
 	title = models.CharField(max_length = 300 , default='')
 	start_time = models.DateTimeField('date', blank=True , null=True )
-	owner_name=models.CharField(max_length=200 ,  default='')
+	owner_name=models.CharField(max_length=200 ,  default='')	
 	place=models.CharField(max_length=200 , default='')
 	category=models.CharField(max_length=200 , default='')
+	photoUrl = models.URLField(max_length=500, default='')
 
 	def __unicode__(self):
 		return self.title
@@ -56,7 +56,7 @@ def insertPage(sender, instance, *args, **kwargs):
 	#checking for URL validation
 	if (r.status_code==404):
 		print("URL not valid")
-		ctypes.windll.user32.MessageBoxA(0, "URL not valid .", "404 error", 1)
+		#ctypes.windll.user32.MessageBoxA(0, "URL not valid .", "404 error", 1)
 		Url.objects.latest('id').delete()
 	elif(r.status_code==200):
 		print("URL is Valid, proceeding...")
@@ -69,15 +69,16 @@ def insertPage(sender, instance, *args, **kwargs):
 		#creating list with events ids
 		for i in range(len(fileJson)):
 			eventsID= fileJson[i]["id"]
-			eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner'+'&access_token='+token
+			eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,picture'+'&access_token='+token
 			#eventAnswer is a json file with the required values: name etc
 			eventAnswer=requests.get(eventRequest)
 			json_event = eventAnswer.json()
 			event_name =  json_event["name"]
+			photo_url = json_event["picture"]["data"]["url"]
 			
 			
 
-			Page_obj = Page(title=event_name,place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category)
+			Page_obj = EventObject(title=event_name,place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
 			print json_event["name"]
 			Page_obj.save()
 			#print(jsona['name'])
