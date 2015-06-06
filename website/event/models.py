@@ -76,7 +76,6 @@ def insertPage(sender, instance, *args, **kwargs):
 			event_name =  json_event["name"]
 			photo_url = json_event["picture"]["data"]["url"]
 			
-			
 
 			Page_obj = EventObject(title=event_name,place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
 			print json_event["name"]
