@@ -1,0 +1,17 @@
+{% extends "yo.html" %}
+{% block content %}
+
+{% for page in object_list %}
+<div class="col-md-4">
+        <h2>{{ page.title}}</h2>
+        <p> on {{page.start_time}}</p>
+		<p>	{{page.owner_name|safe|linebreaks}} </p>
+        <p><a class="btn btn-default" href="#" role="button">Περισσότερα &raquo;</a></p>
+</div>
+
+
+
+
+{% endfor %}
+{% endblock %}
+

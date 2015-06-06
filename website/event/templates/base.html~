@@ -1,0 +1,3 @@
+<h1>PARTA EVENT</h1>
+{% block content %}
+{% endblock %}
