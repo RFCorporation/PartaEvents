@@ -18,7 +18,9 @@ token ='CAAO7ZBEZBU2qcBAAiM7WuiUCsfOdOjlwgyDrfDncpib6DI1ZCoayFIWCBpmZB52ABcVwyxC
 #sys.setdefaultencoding('UTF8')
 
 class EventObject(models.Model):
+	eventsID=models.IntegerField(default=0)
 	title = models.CharField(max_length = 300 , default='')
+	description=models.CharField(max_length=2000, default='')
 	start_time = models.DateTimeField('date', blank=True , null=True )
 	owner_name=models.CharField(max_length=200 ,  default='')	
 	place=models.CharField(max_length=200 , default='')
@@ -56,32 +58,37 @@ def insertPage(sender, instance, *args, **kwargs):
 	#checking for URL validation
 	if (r.status_code==404):
 		print("URL not valid")
-		#ctypes.windll.user32.MessageBoxA(0, "URL not valid .", "404 error", 1)
 		Url.objects.latest('id').delete()
+
 	elif(r.status_code==200):
 		print("URL is Valid, proceeding...")
 		fileJson = (r.json())
 		#keep data that are useful
 		page_category=fileJson["category"]
-		fileJson=fileJson["events"]["data"]
-		
-		
-		#creating list with events ids
-		for i in range(len(fileJson)):
-			eventsID= fileJson[i]["id"]
-			eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,picture'+'&access_token='+token
-			#eventAnswer is a json file with the required values: name etc
-			eventAnswer=requests.get(eventRequest)
-			json_event = eventAnswer.json()
-			event_name =  json_event["name"]
-			photo_url = json_event["picture"]["data"]["url"]
+		if 'events' in fileJson.keys():
+			fileJson=fileJson["events"]["data"]
 			
+			
+			#creating list with events ids
+			for i in range(len(fileJson)):
+				eventsID= fileJson[i]["id"]
+				eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,picture,description'+'&access_token='+token
+				#eventAnswer is a json file with the required values: name etc
+				eventAnswer=requests.get(eventRequest)
+				json_event = eventAnswer.json()
+				if 'name' in json_event.keys():
 
-			Page_obj = EventObject(title=event_name,place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
-			print json_event["name"]
-			Page_obj.save()
-			#print(jsona['name'])
-			#print(eventAnswer.text)
+					event_name =  json_event["name"]
+
+					if 'place' and 'start_time' and 'owner' in json_event.keys():
+
+						photo_url = json_event["picture"]["data"]["url"]
+						Page_obj = EventObject(eventsID=eventsID,title=event_name,description=json_event["description"],place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
+						print json_event["name"]
+						Page_obj.save()
+		
+		else:
+			print('This page has no events')				
 
 
 
