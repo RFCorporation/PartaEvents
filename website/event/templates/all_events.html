@@ -2,19 +2,41 @@
 {% block content %}
 
 {% for info in info_list %}
-
-
-<div class="col-md-4 portfolio-item">
-                 
-                     <img src={{info.photoUrl}}  class="img-rounded" alt="Cinque Terre" width="104" height="86"/></p> 
-                 
-                <h3>
-                    <a href="#">{{ info.title}}</a>
-                </h3>
-                <p> on {{info.start_time}}</p>
-		  <p>	{{info.owner_name|safe|linebreaks}} </p>
-            </div>
-
-
+<div  class="col-md-4 portfolio-item">
+        <img src={{info.photoUrl}}  class="img-rounded" alt="Cinque Terre" width="320" height="120"/></p> 
+		<h3 style="height:26px; display:block; overflow:hidden;" ><a href="/event/{{info.eventsID}}">{{ info.title}}</a></h3>
+		<p> on {{info.start_time}}</p>
+		<p>{{info.owner_name|safe|linebreaks}} </p>
+</div>
 {% endfor %}
+{% endblock %}
+
+
+
+
+{% block categorysearch %}
+<div id="navbar" class="navbar-collapse collapse">
+				 <ul class="nav navbar-nav">
+					
+				 
+				 
+					<li class="dropdown">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Κατηγορίες <span class="caret"></span></a>
+					  <ul class="dropdown-menu" aria-labelledby="themes">
+						{% for info in cat_list %}
+						<li><a href="/cat/{{info}}/">{{info}}</a></li>
+
+						{% endfor %}
+					  </ul>
+					</li>
+				 </ul>
+				<form class="navbar-form pull-left" role="search" action="/search" method="get">
+					<div class="input-group">
+					   <input type="text" name="user_search" class="form-control" placeholder="Αναζήτηση">
+						<div class="input-group-btn">
+						  <button type="submit" name="mysubmit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+						</div>
+					</div>
+				</form>
+			</div><!--/.navbar-collapse -->
 {% endblock %}

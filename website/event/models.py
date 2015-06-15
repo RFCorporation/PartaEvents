@@ -14,8 +14,8 @@ token ='CAAO7ZBEZBU2qcBAAiM7WuiUCsfOdOjlwgyDrfDncpib6DI1ZCoayFIWCBpmZB52ABcVwyxC
 
 # Create your models here.
 
-#reload(sys)  # Reload does the trick!
-#sys.setdefaultencoding('UTF8')
+reload(sys)  # Reload does the trick!
+sys.setdefaultencoding('UTF8')
 
 class EventObject(models.Model):
 	eventsID=models.IntegerField(default=0)
@@ -48,8 +48,10 @@ class Url(models.Model):
 @receiver(post_save, sender=Url)
 def insertPage(sender, instance, *args, **kwargs):
 	page_name = instance.url
+	reload(sys)
+	sys.setdefaultencoding('UTF8')
 	global token
-
+    
 	#construct link for request
 	requestGET='https://graph.facebook.com/v2.3/' + page_name +'?fields=events,category&access_token='+token
 	 #make request
@@ -72,17 +74,17 @@ def insertPage(sender, instance, *args, **kwargs):
 			#creating list with events ids
 			for i in range(len(fileJson)):
 				eventsID= fileJson[i]["id"]
-				eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,picture,description'+'&access_token='+token
+				eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,cover,description'+'&access_token='+token
 				#eventAnswer is a json file with the required values: name etc
 				eventAnswer=requests.get(eventRequest)
 				json_event = eventAnswer.json()
 				if 'name' in json_event.keys():
 
 					event_name =  json_event["name"]
-
+					print (event_name)
 					if 'place' and 'start_time' and 'owner' in json_event.keys():
 
-						photo_url = json_event["picture"]["data"]["url"]
+						photo_url = json_event["cover"]["source"]
 						Page_obj = EventObject(eventsID=eventsID,title=event_name,description=json_event["description"],place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
 						print json_event["name"]
 						Page_obj.save()

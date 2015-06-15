@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+
+<head>
+	<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+	<link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+	<script src="{% static 'js/main.js' %} "></script>
+	<script src="{% static 'js/bootstrap-datepicker.js' %}"> </script>
+	<script>
+		$(function(){
+			$('.datepicker').datepicker();
+			});
+	</script>
+
+</head>
+<body>
+<div>
+ON:<input class="datepicker" type ="text" name="date">
+</div>
+</body>
+
+
+</html>
