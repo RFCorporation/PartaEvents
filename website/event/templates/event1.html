@@ -21,11 +21,30 @@
     <link href="{% static 'css/jumbotron.css' %}" rel="stylesheet">
 	
 	<!-- Datepicker-->
-   
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+
+	  <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU6FjOMEiGHpolpYDmEJV6pTE27f7J5uA">
+    </script>
+    <script type="text/javascript">
+      function initialize() {
+        var mapOptions = {
+          center:new google.maps.LatLng(38.242, 21.733),
+          zoom: 17
+        };
+        var map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+			
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
 	
 </head>
 
-<body>
+<body   style="background: url({% static 'images/back1.jpg' %}) 50% 0px / cover no-repeat fixed;" >
 
     <!-- Navigation -->
 	<nav class="navbar navbar-inverse navbar-fixed-top">
@@ -89,18 +108,39 @@
 		  </a>
 		 </div>	 
 		</div> <!-- Carousel -->
-	</div>	
+	</div>
+	<p></p>
+	
+	
 	<div style ="margin-top:30px;" class="container">
       		<div class="row">
-			{% block content %}	
-			{% endblock %}
+			
+				<div class="col-md-1"  style="text-align:center; border:4px solid #DEDEDE;border-radius:10px;background:#E5E5E5; padding-left:10px; padding-right:10px;">
+
+					<form id="datesearch" role='search' action="/datesearch/" method="get"> 
+						<div  style="text-align:left;">
+							<strong>Start Date </strong> <input style="width:100%;" name="startDate" id="start" class="datepicker" type ="text" name="date">
+
+
+							<strong>End  Date </strong> <input style="width:100%;" name="endDate" id="end" class="datepicker" type ="text" name="date">
+							<p></p>
+							<button type="submit" class="btn btn-info">Search</button>
+						</div>
+					</form>
+
+				</div>
+				<div class="col-md-11">
+				
+				{% block content %}	
+				{% endblock %}
+				</div>
 			</div>
 			
 	</div>	 
-        <hr>
+       
 	
     
-        <!-- Pagination 
+       
         <div class="row text-center">
             <div class="col-lg-12">
                 <ul class="pagination">
@@ -127,7 +167,7 @@
                     </li>
                 </ul>
             </div>
-        </div> -->
+        </div>
 
         <!-- /.row -->
 
@@ -151,8 +191,36 @@
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   
     <!-- Bootstrap Core JavaScript -->
-     <script src="{% static 'js/bootstrap.min.js' %}"></script>
      
+	 <script src="{% static 'js/main.js' %} "></script>
+	<script src="{% static 'js/bootstrap-datepicker.js' %}"> </script>
+	<script>
+		$(function(){
+			$('.datepicker').datepicker();
+			});
+	</script>
+
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+	 <script type="text/javascript">
+	    var frm = $('#FORM-ID');
+	    frm.submit(function () {
+	        $.ajax({
+	            type: frm.attr('method'),
+	            url: frm.attr('action'),
+	            data: frm.serialize(),
+	            success: function (data) {
+	                $("#SOME-DIV").html(data);
+	            },
+	            error: function(data) {
+	                $("#MESSAGE-DIV").html("Something went wrong!");
+	            }
+	        });
+	        return false;
+   		 });
+	</script>
+
+	 
 </body>
 
 

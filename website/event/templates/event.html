@@ -3,14 +3,14 @@
 
 {% for page in object_list %}
 <div  class="col-md-4">
-	 
-	<div   style="text-align:center; border:4px solid #DEDEDE;border-radius:10px;background:#EDEDEC; padding-left:10px; padding-right:10px;">
-        <h4 style="height:26px; display:block; overflow:hidden;"><strong>{{ page.title}}</strong></h4>
+	
+	<div   style="text-align:center; border:3px solid #DEDEDE;border-radius:20px;background:#EDEDEC; padding-left:10px; padding-right:10px;">
+        <h4 style="height:22px; display:block; overflow:hidden;"><strong>{{ page.title}}</strong></h4>
     	</p> <img src={{page.photoUrl}}  class="img-rounded" alt="Cinque Terre" width="160" height="70"/></p> 
         <p> on {{page.start_time}}</p>
         <p> {{page.owner_name}}</p>
 
-        <p><a class="btn btn-default" href="event/{{page.eventsID}}" role="button">Περισσότερα &raquo;</a></p>
+        <p><a class="btn btn-primary " href="event/{{page.eventsID}}" role="button" >Περισσότερα &raquo;</a></p>
 	</div>
 	 
 </div>

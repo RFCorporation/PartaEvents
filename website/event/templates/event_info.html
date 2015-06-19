@@ -21,11 +21,27 @@
     <link href="{% static 'css/jumbotron.css' %}" rel="stylesheet">
 	
 	<!-- Datepicker-->
-   
+ <style>
+      .FixedHeightContainer
+{
+  float:right;
+  height: 370px;
+  width:100%; 
+ 
+  
+}
+.Content
+{
+  height:100%;
+   overflow:auto;
+
+}
+</style>
+ 
 	
 </head>
 
-<body>
+<body background="{% static 'images/background.jpg' %}">
 
     <!-- Navigation -->
 	<nav class="navbar navbar-inverse navbar-fixed-top">
@@ -59,13 +75,39 @@
 
 							<div  class="thumbnail"  style="text-align:center; width:800px; display:block; margin:0 auto;  border:4px solid #DEDEDE;border-radius:10px ;background:#EDEDEC; padding-left:10px; padding-right:10px;">
 								
-									 <h4 style="height:22px; display:block; overflow:hidden;"><strong>{{ info.title}}</strong></h4>
+									 <h4><strong>{{ info.title}}</strong></h4>
 									<p> on {{info.start_time}}</p>
 									<p> Διοργανωτής : {{info.owner_name}} </p>
-								
+									
+									
 							</div>
-						</div>
+							<hr>
+						<div class = "container" style="text-align:left; "  >
+							<div class="row">
+								<div class="col-md-5"  style="float:left;  text-align:center; border:4px solid #DEDEDE;border-radius:10px;background:#E5E5E5; padding-left:10px; padding-right:1px;">
+									<div height="overflow:auto;" style="text-align:left;">
+									
+									<div class="FixedHeightContainer">
+									  <div class="Content">
+										<p style="height:100%;" >{{info.description}}</p>
+										  </div>
+									</div>
+									</div>
+								
+					
+								</div>
+									<div class="col-md-7" style="text-align:center; float:left; padding-top:1px;">
+									
+									<!-- map container -->			
+									<div   id="map-canvas" style="width:500px;height:380px;">
+									</div>
+									 
+									
+									</div>
+							</div>
 						
+						</div>
+						</div>
 						{% endfor %}
 
 					</div>
@@ -73,7 +115,7 @@
 
 			
 	</div>	 
-        <hr>
+      
 	
 
 
@@ -109,7 +151,7 @@
 
         <!-- /.row -->
 
-        <hr>
+      
 
         <!-- Footer -->
         <footer>
@@ -130,7 +172,47 @@
   
     <!-- Bootstrap Core JavaScript -->
      <script src="{% static 'js/bootstrap.min.js' %}"></script>
-     
+	  
+      <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU6FjOMEiGHpolpYDmEJV6pTE27f7J5uA">
+    </script>
+    <script type="text/javascript">
+	{% for info in info_list %}
+	if ({{info.latitude}} != 0.0 && {{info.longitude}} != 0.0){
+	var myCenter=new google.maps.LatLng({{info.latitude}},{{info.longitude}});
+		{{info.latitude}}
+      function initialize() {
+        var mapOptions = {
+          center:new google.maps.LatLng({{info.latitude}},{{info.longitude}}),
+          zoom: 15
+        };
+		<!-- Create a Map Object -->
+        var map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
+		var marker=new google.maps.Marker({
+			position:myCenter,
+			  animation:google.maps.Animation.BOUNCE
+  
+		});
+
+	marker.setMap(map);
+	
+	var infowindow = new google.maps.InfoWindow({
+  content:" {{info.owner_name}}"
+  });
+google.maps.event.addListener(marker, 'click', function() {
+  infowindow.open(map,marker);
+  });
+}
+	  <!-- Add Event Listener to Load Map -->
+      google.maps.event.addDomListener(window, 'load', initialize);
+	  }
+	 {% endfor %}
+    </script>
+      
+      
+      
+	 
+	 
 </body>
 
 

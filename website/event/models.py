@@ -10,8 +10,9 @@ from django.dispatch import receiver
 
 
 global token
+global API_KEY
 token ='CAAO7ZBEZBU2qcBAAiM7WuiUCsfOdOjlwgyDrfDncpib6DI1ZCoayFIWCBpmZB52ABcVwyxCkm3xFYLzT7MNdK8ZAZAPDbluugkd5MAiUGZBO09EUYKZAV6PHzDG4BtZAI1V8PJdFLYKYUreuMQoyZB3WEpTSnHuDtO48wdHr1YWiV10NKJ5MxcI2Cw7z4PUkxEzoAiUXdb14gPqeVBlzRLmAwhqnkVexOLnxMZD'
-
+API_KEY='AIzaSyCU6FjOMEiGHpolpYDmEJV6pTE27f7J5uA'
 # Create your models here.
 
 reload(sys)  # Reload does the trick!
@@ -26,7 +27,9 @@ class EventObject(models.Model):
 	place=models.CharField(max_length=200 , default='')
 	category=models.CharField(max_length=200 , default='')
 	photoUrl = models.URLField(max_length=500, default='')
-
+	longitude = models.FloatField(default=0.0)
+	latitude =  models.FloatField(default=0.0)
+	
 	def __unicode__(self):
 		return self.title
 
@@ -40,7 +43,7 @@ class Url(models.Model):
 	#adding extra argument to signal
 	def save(self,*args, **kwargs):
 		super(Url, self).save(*args, **kwargs)
-		#self.page_name=self.url
+		self.page_name=self.url
 
 
 
@@ -48,9 +51,15 @@ class Url(models.Model):
 @receiver(post_save, sender=Url)
 def insertPage(sender, instance, *args, **kwargs):
 	page_name = instance.url
+	page_name=page_name.rsplit('/',1)[1]
+	 
+	global token
+
+	#needed for pages with non english characters
 	reload(sys)
 	sys.setdefaultencoding('UTF8')
-	global token
+	#flag is True if page already exists in database
+	flag=False
     
 	#construct link for request
 	requestGET='https://graph.facebook.com/v2.3/' + page_name +'?fields=events,category&access_token='+token
@@ -65,32 +74,57 @@ def insertPage(sender, instance, *args, **kwargs):
 	elif(r.status_code==200):
 		print("URL is Valid, proceeding...")
 		fileJson = (r.json())
-		#keep data that are useful
-		page_category=fileJson["category"]
-		if 'events' in fileJson.keys():
-			fileJson=fileJson["events"]["data"]
-			
-			
-			#creating list with events ids
-			for i in range(len(fileJson)):
-				eventsID= fileJson[i]["id"]
-				eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,cover,description'+'&access_token='+token
-				#eventAnswer is a json file with the required values: name etc
-				eventAnswer=requests.get(eventRequest)
-				json_event = eventAnswer.json()
-				if 'name' in json_event.keys():
+		allpages=list(Url.objects.all())
+		allpages.pop()
+		#checking if page already exists in database
+		for page in allpages:
+			if page_name==page.url:
+				flag=True
+				print('page already exists')
+				
+				Url.objects.latest('id').delete()
 
-					event_name =  json_event["name"]
-					print (event_name)
-					if 'place' and 'start_time' and 'owner' in json_event.keys():
+		#if page does not already exist in database
+		if flag==False:
+			#keep data that are useful
+			page_category=fileJson["category"]
+			#checking if page has any eventss
+			if 'events' in fileJson.keys():
+					fileJson=fileJson["events"]["data"]
+						
+						
+					#creating list with events ids
+					for i in range(len(fileJson)):
+						eventsID= fileJson[i]["id"]
+						print(eventsID)
+						eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,cover,description'+'&access_token='+token
+						#eventAnswer is a json file with the required values: name etc
+						eventAnswer=requests.get(eventRequest)
+						json_event = eventAnswer.json()
+						if 'name' in json_event.keys():
+							event_name =  json_event["name"]
+							print (event_name)
+							#checking if all values exist
+							if 'place' and 'start_time' and 'owner'  in json_event.keys():
+								photo_url = json_event["cover"]["source"]
+								if 'location' in  json_event['place']:
+									longlat_json = json_event["place"]["location"]
+									print("yo1")
+								else:
+									longlat_json = json_event["place"]
+									print("yo")
+									
+								if 'longitude' and 'latitude' in longlat_json.keys():
+									
+									Page_obj = EventObject(latitude=longlat_json["latitude"],longitude=longlat_json["longitude"],eventsID=eventsID,title=event_name,description=json_event["description"],place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
+									print(longlat_json["latitude"])
+								else:
+									Page_obj = EventObject(eventsID=eventsID,title=event_name,description=json_event["description"],place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
+								#print json_event["name"]
+								Page_obj.save()
+			else:
+				print('This page has no events')
 
-						photo_url = json_event["cover"]["source"]
-						Page_obj = EventObject(eventsID=eventsID,title=event_name,description=json_event["description"],place = json_event["place"]["name"],start_time =json_event["start_time"],owner_name=json_event['owner']['name'],category = page_category, photoUrl=photo_url)
-						print json_event["name"]
-						Page_obj.save()
-		
-		else:
-			print('This page has no events')				
 
 
 
