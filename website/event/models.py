@@ -50,7 +50,10 @@ class Url(models.Model):
 
 @receiver(post_save, sender=Url)
 def insertPage(sender, instance, *args, **kwargs):
+	#page_name holds the url admin entered
 	page_name = instance.url
+	
+	#insert comment here
 	page_name=page_name.rsplit('/',1)[1]
 	 
 	global token
@@ -58,6 +61,7 @@ def insertPage(sender, instance, *args, **kwargs):
 	#needed for pages with non english characters
 	reload(sys)
 	sys.setdefaultencoding('UTF8')
+
 	#flag is True if page already exists in database
 	flag=False
     
@@ -76,43 +80,45 @@ def insertPage(sender, instance, *args, **kwargs):
 		fileJson = (r.json())
 		allpages=list(Url.objects.all())
 		allpages.pop()
-		#checking if page already exists in database
+		#checking if page already exists in database, then flag=True
 		for page in allpages:
 			if page_name==page.url:
 				flag=True
 				print('page already exists')
-				
+
+				#delete page that already exists
 				Url.objects.latest('id').delete()
 
 		#if page does not already exist in database
 		if flag==False:
 			#keep data that are useful
 			page_category=fileJson["category"]
+
 			#checking if page has any eventss
 			if 'events' in fileJson.keys():
 					fileJson=fileJson["events"]["data"]
 						
 						
-					#creating list with events ids
+					#creating list with event ids
 					for i in range(len(fileJson)):
 						eventsID= fileJson[i]["id"]
-						print(eventsID)
-						eventRequest='https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,cover,description'+'&access_token='+token
+						
+						eventRequest = 'https://graph.facebook.com/v2.3/'+eventsID+'?fields=name,place,start_time,owner,cover,description'+'&access_token='+token
 						#eventAnswer is a json file with the required values: name etc
 						eventAnswer=requests.get(eventRequest)
 						json_event = eventAnswer.json()
 						if 'name' in json_event.keys():
 							event_name =  json_event["name"]
-							print (event_name)
+							
 							#checking if all values exist
 							if 'place' and 'start_time' and 'owner'  in json_event.keys():
 								photo_url = json_event["cover"]["source"]
 								if 'location' in  json_event['place']:
 									longlat_json = json_event["place"]["location"]
-									print("yo1")
+									
 								else:
 									longlat_json = json_event["place"]
-									print("yo")
+									
 									
 								if 'longitude' and 'latitude' in longlat_json.keys():
 									

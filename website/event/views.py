@@ -5,20 +5,26 @@ from django.template import Context
 from event.models import EventObject
 # Create your views here.
 from forms import SearchForm
+from operator import attrgetter
+
 import sys,datetime,pytz
 
 
-#called when parta events button in homepage is clicked,
+#called when "par'ta events" button in homepage is clicked,
 def all_events(request):
 	category_List=[]
-	allcategorys=EventObject.objects.all()
+	event_list=EventObject.objects.all().order_by("start_time")
 
-	for event in allcategorys:
+	for event in event_list:
 		category_List.append(event.category)
-	category_List = set(category_List)
-	return render_to_response('all_events.html',{'info_list': set(EventObject.objects.all()),'cat_list':category_List})
+		print(event.start_time)
 
-#function called when event title/perissotera is clicked
+	#keep only unique items/no double entries
+	category_List = set(category_List)
+	
+	return render_to_response('all_events.html',{'info_list': event_list,'cat_list':category_List})
+
+#called when event title/perissotera button is clicked
 def event_details(request,id):
 	answerList=[]
 	allevents=EventObject.objects.all()
@@ -34,6 +40,7 @@ def event_details(request,id):
 	return render_to_response('event_info.html',{'info_list':answerList})
 
 #called when category in dropdown bar is clicked
+#returns events that belong to selected category
 def category_events(request,cat):
 	answerList=[]
 	category_List=[]
@@ -49,10 +56,12 @@ def category_events(request,cat):
 	return render_to_response('all_events.html',{'info_list':answerList, 'cat_list':category_List})
 
 
+#function called when user searches trough datepicker
+#returns all events in time 
 def datesearch(request):
 	answerList=[]
-	allevents=EventObject.objects.all()
-	#getting data from form
+	allevents=EventObject.objects.all().order_by("start_time")
+	#getting data from form submitted
 	start_date=str(request.GET.get('startDate')).split('/')
 	end_date=str(request.GET.get('endDate')).split('/')
 
@@ -76,7 +85,7 @@ def datesearch(request):
 			if event.start_time <= end_date:
 				answerList.append(event)
 
-	#if user entered both return events in [start_date,end_date]
+	#if user entered both dates return events in [start_date,end_date]
 	elif start_date[0]!='' and end_date[0]!='':
 		#morfing of data
 		start_date=datetime.datetime(int(start_date[2]),int(start_date[0]),int(start_date[1]),0,0,0,0).replace(tzinfo=pytz.UTC)
@@ -84,7 +93,6 @@ def datesearch(request):
 
 		#checkinf if end date is after start date
 		if end_date >= start_date:
-			print('allcool')
 			
 
 			for event in allevents:
