@@ -192,33 +192,46 @@
   
     <!-- Bootstrap Core JavaScript -->
      
-	 <script src="{% static 'js/main.js' %} "></script>
+	  <script src="{% static 'js/main.js' %} "></script>
 	<script src="{% static 'js/bootstrap-datepicker.js' %}"> </script>
 	<script>
 		$(function(){
 			$('.datepicker').datepicker();
+		  if ($(".dropdown-menu-checkbox").on("click", function(e){
+        
+        e.preventDefault();
+
+        return false;
+
+      }));
+	  $(".popup_checkbox").on("click", function(e){
+
+        e.stopPropagation();
+
+      });
+	  $(".popup_submit").on("click", function(e){
+
+        var cats = "";
+
+        $(".popup_checkbox").each(function (i){
+          if ($(this).is(":checked")){
+            cats += $(this).attr("value") + ",";
+          }
+        });
+
+       // var url = $(".rss_categ").attr("action");
+
+           var cats2 = cats.substring(0, cats.length -1);
+
+        $(".rss_categ").attr("action", "/rss/" + cats2);
+		 
+        e.stopPropagation();
+
+      });
 			});
+			
 	</script>
-
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
-
-	 <script type="text/javascript">
-	    var frm = $('#FORM-ID');
-	    frm.submit(function () {
-	        $.ajax({
-	            type: frm.attr('method'),
-	            url: frm.attr('action'),
-	            data: frm.serialize(),
-	            success: function (data) {
-	                $("#SOME-DIV").html(data);
-	            },
-	            error: function(data) {
-	                $("#MESSAGE-DIV").html("Something went wrong!");
-	            }
-	        });
-	        return false;
-   		 });
-	</script>
 
 	 
 </body>

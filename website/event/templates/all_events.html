@@ -1,4 +1,6 @@
 {% extends "event1.html" %}
+<!DOCTYPE html>
+{% load staticfiles %}
 {% block content %}
 
 {% for info in info_list %}
@@ -19,16 +21,19 @@
 <div id="navbar" class="navbar-collapse collapse">
 				 <ul class="nav navbar-nav">
 					
-		
+					{% if  cat_list %}
 					<li class="dropdown">
 					  <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">Κατηγορίες <span class="caret"></span></a>
 					  <ul class="dropdown-menu" aria-labelledby="themes">
+						
 						{% for info in cat_list %}
 						<li><a href="/cat/{{info}}/">{{info}}</a></li>
 
 						{% endfor %}
+						
 					  </ul>
 					</li>
+					{% endif %}
 				 </ul>
 				<form class="navbar-form pull-left" role="search" action="/search" method="get">
 					<div class="input-group">
@@ -38,5 +43,32 @@
 						</div>
 					</div>
 				</form>
-			</div><!--/.navbar-collapse -->
+				<form class="rss_categ" method="get" action="/rss">
+					{% if  cat_list %}
+					<div class="button-group"  style="position:relative; float:right; margin-top:10px;">
+						<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+							<span class="glyphicon glyphicon-cog"></span>
+							
+							ΔΗΜΙΟΥΡΓΙΑ RSS	
+							<span class="caret"></span>
+						</button>
+					
+							<ul class="dropdown-menu-checkbox dropdown-menu">
+								  {% for info in cat_list %}
+								  <li><a href="#" class="small"><input  class="popup_checkbox" type="checkbox" value="{{info}}"/>&nbsp;{{info}}</a></li>
+									{% endfor %}
+								  <li style="text-align:center;" ><button type="submit"  class="btn btn-default popup_submit" >Submit</button></li>
+							</ul>
+					  
+					</div>
+					{% endif %}
+				</form>
+				<!--<div>
+					<a href="{% static 'events.xml' %}">
+					<img src="http://www.w3schools.com/webservices/rss.gif" width="36" height="14">
+					
+					</a>. 
+				</div>  -->
+				
+</div><!--/.navbar-collapse -->
 {% endblock %}

@@ -11,5 +11,7 @@ urlpatterns = patterns('',
 	 url(r'^cat/(?P<cat>[A-Za-z/\s]+)/$',category_events),
 	 url(r'^date/$',date),
 	 url(r'^maps/$',maps),
-     url(r'^datesearch/$', datesearch)
+     url(r'^datesearch/$', datesearch),
+	 url(r'^rss/(?P<categ>[A-Za-z/,\s]+)/$',index),
+	 url(r'^rss/$',all_events),
     )

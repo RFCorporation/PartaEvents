@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>PartaEvents</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+	
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/jumbotron.css' %}" rel="stylesheet">
+	
+	<!-- Datepicker-->
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+
+	  <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCU6FjOMEiGHpolpYDmEJV6pTE27f7J5uA">
+    </script>
+    <script type="text/javascript">
+      function initialize() {
+        var mapOptions = {
+          center:new google.maps.LatLng(38.242, 21.733),
+          zoom: 17
+        };
+        var map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+			
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+	
+</head>
+
+<body   style="background: url({% static 'images/RSS_img.png' %}) 50% 0px / cover no-repeat fixed;" >
+		
+    <!-- Navigation -->
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">PartaEvents</a> 
+				
+			</div>
+		
+			<div>
+		<a href="{% static 'rss/events.xml' %}">
+		<img src="http://www.w3schools.com/webservices/rss.gif" width="36" height="14">
+					
+					</a>. 
+			</div>  
+			
+      </div>
+    </nav>
+
+
+	
+	
+	
+	<div style ="margin-top:30px;" class="container">
+      		<div class="row">
+			
+				
+			</div>
+			
+	</div>	 
+       
+	
+    
+       
+     
+
+        <!-- /.row -->
+
+        <hr>
+
+    
+
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery -->
+   
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  
+    <!-- Bootstrap Core JavaScript -->
+     
+	 <script src="{% static 'js/main.js' %} "></script>
+	<script src="{% static 'js/bootstrap-datepicker.js' %}"> </script>
+	<script>
+		$(function(){
+			$('.datepicker').datepicker();
+		  if ($(".dropdown-menu-checkbox").on("click", function(e){
+        
+        e.preventDefault();
+
+        return false;
+
+      }));
+	  $(".popup_checkbox").on("click", function(e){
+
+        e.stopPropagation();
+
+      });
+	  $(".popup_submit").on("click", function(e){
+
+        var cats = "";
+
+        $(".popup_checkbox").each(function (i){
+          if ($(this).is(":checked")){
+            cats += $(this).attr("value") + ",";
+          }
+        });
+
+       // var url = $(".rss_categ").attr("action");
+
+           var cats2 = cats.substring(0, cats.length -1);
+
+        $(".rss_categ").attr("action", "/rss/" + cats2);
+		 
+        e.stopPropagation();
+
+      });
+			});
+			
+	</script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	 
+	 
+</body>
+
+
+</html>

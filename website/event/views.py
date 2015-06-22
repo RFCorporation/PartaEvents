@@ -3,11 +3,16 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template import Context
 from event.models import EventObject
-# Create your views here.
 from forms import SearchForm
 from operator import attrgetter
+from django.contrib import messages
+from django.utils import feedgenerator
 
-import sys,datetime,pytz
+import re
+import sys,datetime,pytz,os
+import PyRSS2Gen
+
+# Create your views here.
 
 
 #called when "par'ta events" button in homepage is clicked,
@@ -44,7 +49,7 @@ def event_details(request,id):
 def category_events(request,cat):
 	answerList=[]
 	category_List=[]
-	allevents=EventObject.objects.all()
+	allevents=EventObject.objects.all().order_by("start_time")
 	for event in allevents:
 		category_List.append(event.category)
 		
@@ -143,7 +148,39 @@ def search(request):
 	category_List = set(category_List)
 
 	return render_to_response('all_events.html',{'info_list': answerList, 'cat_list':category_List})
+	
 
+def index(request,categ):
+	path = os.path.dirname(os.path.abspath(__file__))
+	path = path + "/static/rss/events.xml"
+	categoy_list=str(categ).split(',')
+	print(categoy_list)
+	reload(sys)  # Reload does the trick!
+	sys.setdefaultencoding('UTF8')
+	allevents=EventObject.objects.all()
+	item1=[]
+	for event in allevents:
+		item1.append(PyRSS2Gen.RSSItem(
+				title = event.title,
+				link = "http://127.0.0.1:8000/event/"+str(event.eventsID),
+				description = event.description,
+				guid = PyRSS2Gen.Guid("http://127.0.0.1:8000/event/"+str(event.eventsID)),
+				#pubDate = datetime.datetime(2003, 9, 6, 21, 31))
+				))	
+	
+	
+	rss = PyRSS2Gen.RSS2(
+	title = "PartaEvent's feed",
+	link = "http://127.0.0.1:8000",
+	description = "The latest news about Patra's Events .",
+	items = item1)
+				
+	
+		
+	rss.write_xml(open(path, "w"))
+	
+
+	return render(request, 'index.html')
 
 
 
